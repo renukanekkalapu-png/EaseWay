@@ -342,7 +342,7 @@ Choose an option (1-9): 8
 
 | Contributor | Profile Link | Role |
 | :--- | :--- | :--- |
-| **Renuka Nekkalapu** | [@renukanekkalapu-png](https://github.com/renukanekkalapu-png) | Project Lead & Maintainer |
+| **Renuka Nekkalapu** | [@renukanekkalapu-png](https://github.com/renukanekkalapu-png) | Collaborator / Contributor |
 | **Paoli Patra** | [@paoli-patra26](https://github.com/paoli-patra26) | Collaborator / Contributor |
 | **Tanvi J** | [@tanvij33](https://github.com/tanvij33) | Collaborator / Contributor |
 | **Manasi Kittur** | [@kitturmanasi-lgtm](https://github.com/kitturmanasi-lgtm) | Collaborator / Contributor |
