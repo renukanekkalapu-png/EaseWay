@@ -1,0 +1,13 @@
+# Byte-compiled / binary files
+bin/
+*.class
+
+# IDE and Editor configuration
+.idea/
+*.iml
+.vscode/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
