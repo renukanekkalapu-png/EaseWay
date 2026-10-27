@@ -65,268 +65,462 @@ public class CampusMap {
     }
 
     /**
-     * Builds and initializes the authentic RVCE Mysuru Road campus network.
+     * Builds and initializes the authentic RVCE Mysuru Road campus network
+     * with 20 specified campus locations.
      */
     public static CampusMap createRVCEMap() {
         CampusMap map = new CampusMap();
 
-        // 1. RVCE Campus Locations
-        Location mainGate = new Location(
-                "RV_MG", "Main Gate (Mysuru Road)", FacilityCategory.ENTRANCE,
-                "Primary RVCE entrance on Mysuru Road opposite RVCE Metro Station with ramped pedestrian turnstiles.",
+        // ============================================================
+        // 1. RVCE Campus Locations (20 locations as specified)
+        // ============================================================
+
+        Location cauevryBlock = new Location(
+                "RV_CAU", "Cauvery Block", FacilityCategory.RESIDENTIAL,
+                "Cauvery hostel block — student residential complex with reading rooms and laundry.",
+                AccessibilityStatus.YES, AccessibilityStatus.YES,
+                "Wheelchair ramp at main entrance, lift access to upper floors."
+        );
+
+        Location cse = new Location(
+                "RV_CSE", "Computer Science and Engineering", FacilityCategory.ACADEMIC,
+                "CSE department block — AI/ML labs, computer labs, seminar halls, and faculty offices.",
+                AccessibilityStatus.YES, AccessibilityStatus.YES,
+                "Ground-floor wheelchair ramp, elevators in core lobby."
+        );
+
+        Location mingosCafe = new Location(
+                "RV_CAFE", "RVCE Mingos Cafe Main Canteen", FacilityCategory.DINING,
+                "Main student canteen — Mingos Cafe offering variety of meals, snacks, and beverages.",
                 AccessibilityStatus.NO, AccessibilityStatus.YES,
-                "Level plaza access, wide automated gate, tactile pavement guiding to Admin Block."
+                "Step-free ground-level dining area with wide entry doors and low counters."
         );
 
-        Location adminBlock = new Location(
-                "RV_ADM", "Administrative Block", FacilityCategory.ADMINISTRATIVE,
-                "Principal's Office, Dean Academics, Registrar, Examination Section, and Student Finance.",
+        Location mainGate = new Location(
+                "RV_MG", "RVCE Vidyanikethan Main Gate", FacilityCategory.ENTRANCE,
+                "Primary RVCE campus entrance on Mysuru Road with security check and ramp access.",
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                "Level plaza, wide automated gate, tactile pavement to Admin Block."
+        );
+
+        Location eee = new Location(
+                "RV_EEE", "EEE Department", FacilityCategory.ACADEMIC,
+                "Electrical and Electronics Engineering department — power systems labs, drives lab, and seminar rooms.",
                 AccessibilityStatus.YES, AccessibilityStatus.YES,
-                "Front concrete ramp (1:12 slope), internal hydraulic lift servicing all floors."
+                "North-side ramp entry, elevator access to all laboratory floors."
         );
 
-        Location library = new Location(
-                "RV_LIB", "Dr. A.P.J. Abdul Kalam Central Library", FacilityCategory.LIBRARY,
-                "Multi-storey central university library, digital research repository, and quiet study halls.",
+        Location aimlLibrary = new Location(
+                "RV_AIML_LIB", "Department of AIML Departmental Library", FacilityCategory.LIBRARY,
+                "AIML department library — curated AI/ML reference books, journals, and digital resources.",
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                "Ground floor accessible section, wide aisles between bookshelves."
+        );
+
+        Location iemAudi = new Location(
+                "RV_IEM_AUD", "IEM Auditorium", FacilityCategory.AUDITORIUM,
+                "IEM department auditorium — seminars, conferences, and departmental events.",
                 AccessibilityStatus.YES, AccessibilityStatus.YES,
-                "Dual passenger elevators, automatic sensor doors, accessible braille section on Ground Floor."
+                "Wheelchair ramp at entrance, designated accessible seating in front rows."
         );
 
-        Location cseBlock = new Location(
-                "RV_CSE", "CSE & ISE Department Block", FacilityCategory.ACADEMIC,
-                "Computer Science and Information Science department, AI/ML labs, and seminar halls.",
-                AccessibilityStatus.YES, AccessibilityStatus.YES,
-                "Ground floor wheelchair ramp, elevators in core lobby, covered skybridge connecting to Central Library."
-        );
-
-        Location eceBlock = new Location(
-                "RV_ECE", "ECE & Telecom Block", FacilityCategory.ACADEMIC,
-                "Electronics & Communication, VLSI labs, and Telecommunication Engineering department.",
+        Location ece = new Location(
+                "RV_ECE", "Electronics and Communication Department", FacilityCategory.ACADEMIC,
+                "ECE department — VLSI labs, signal processing labs, and telecommunication engineering.",
                 AccessibilityStatus.YES, AccessibilityStatus.YES,
                 "North ramped entry, lift access to 1st, 2nd, and 3rd-floor laboratories."
         );
 
-        Location mechBlock = new Location(
-                "RV_MECH", "Mechanical & Civil Block", FacilityCategory.ACADEMIC,
-                "Mechanical and Civil Engineering departments, design studios, and material testing labs.",
+        Location rvUniversity = new Location(
+                "RV_UNI", "RV University", FacilityCategory.ADMINISTRATIVE,
+                "RV University administrative hub — admissions, university offices, and academic coordination.",
                 AccessibilityStatus.YES, AccessibilityStatus.YES,
-                "Ramped south portico; passenger elevator installed in the Civil Engineering wing."
+                "Front concrete ramp (1:12 slope), internal hydraulic lift servicing all floors."
         );
 
-        Location auditorium = new Location(
-                "RV_AUD", "Sir M. Visvesvaraya Auditorium", FacilityCategory.AUDITORIUM,
-                "Grand campus auditorium for 8th Mile cultural fest, convocation, and national symposiums.",
-                AccessibilityStatus.YES, AccessibilityStatus.YES,
-                "Direct wheelchair ramps to Main Hall, dedicated wheelchair seating in front and middle rows."
-        );
-
-        Location foodCourt = new Location(
-                "RV_MUNCH", "Campus Food Court (Munch Box)", FacilityCategory.DINING,
-                "Central student dining hub, Munch Box food stalls, vegetarian cafeteria, and juice bar.",
+        Location parkingSlot = new Location(
+                "RV_PARK", "RVCE Parking Slot", FacilityCategory.ENTRANCE,
+                "Designated campus parking area — two-wheelers, four-wheelers, and accessible parking bays.",
                 AccessibilityStatus.NO, AccessibilityStatus.YES,
-                "Step-free ground-level dining hall, wide entranceways, low ordering counter."
+                "Flat level surface, dedicated accessible parking bays with ramp to sidewalk."
         );
 
-        Location healthCentre = new Location(
-                "RV_HLTH", "Health Centre & Pharmacy", FacilityCategory.HEALTHCARE,
-                "24/7 on-campus medical clinic, emergency first-aid station, doctor consultation, and pharmacy.",
+        Location tennisCourt = new Location(
+                "RV_TENNIS", "Tennis Court", FacilityCategory.RECREATION,
+                "RVCE tennis courts — hard-surface courts available for students and faculty.",
                 AccessibilityStatus.NO, AccessibilityStatus.YES,
-                "Direct ambulance access bay, zero-step entrance ramp, accessible patient restroom."
+                "Paved pathway approach, viewing area accessible via flat path."
         );
 
-        Location hostel = new Location(
-                "RV_HSTL", "Chamundi & Cauvery Hostels", FacilityCategory.RESIDENTIAL,
-                "Student residential complex with dining halls, laundry, and reading rooms.",
+        Location ganeshaTemple = new Location(
+                "RV_TEMPLE", "Ganesha Temple", FacilityCategory.RECREATION,
+                "Campus Ganesha temple — spiritual centre visited by students and staff.",
                 AccessibilityStatus.YES, AccessibilityStatus.YES,
-                "Ground-floor accessible rooms, wheelchair ramp at Cauvery block with lift to upper dormitories."
+                "Level pathway with ramp at temple entrance; accessible prayer area."
         );
 
-        Location sportsComplex = new Location(
-                "RV_SPRT", "Sports Complex & Cricket Ground", FacilityCategory.RECREATION,
-                "Cricket oval, athletic track, outdoor basketball courts, and indoor sports gymnasium.",
+        Location mainGround = new Location(
+                "RV_GROUND", "RVCE Main Ground", FacilityCategory.RECREATION,
+                "Large open sports ground — cricket, football, athletics, and cultural event venue.",
+                AccessibilityStatus.YES, AccessibilityStatus.NO,
+                "Ramped pavilion entrance; paved accessible walkway around the ground perimeter."
+        );
+
+        Location miniCanteen = new Location(
+                "RV_MINI_CAN", "Mini Canteen", FacilityCategory.DINING,
+                "Small departmental canteen near academic blocks — quick snacks and beverages.",
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                "Ground-level step-free access; space for mobility aids."
+        );
+
+        Location library = new Location(
+                "RV_LIB", "Library", FacilityCategory.LIBRARY,
+                "RVCE Central Library — multi-storey digital repository, reference books, and study halls.",
                 AccessibilityStatus.YES, AccessibilityStatus.YES,
-                "Ramped pavilion entrance; accessible pathway surrounding the cricket oval."
+                "Dual passenger elevators, automatic sensor doors, accessible braille section on Ground Floor."
         );
 
-        Location heritageWorkshop = new Location(
-                "RV_HERIT", "Heritage Mechanical Workshop", FacilityCategory.ACADEMIC,
-                "Original 1963 historic machine workshop and foundry shed.",
-                AccessibilityStatus.NO, AccessibilityStatus.NO,
-                "Historical 1963 brick building; exterior access only via stone stairs or unpaved rear lane."
+        Location mechLibrary = new Location(
+                "RV_MECH_LIB", "Mechanical Department Library", FacilityCategory.LIBRARY,
+                "Mechanical Engineering departmental library — engineering references and project archives.",
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                "Ground-floor location with step-free access and wide reading-room aisles."
         );
 
-        // Register nodes
+        Location iemDept = new Location(
+                "RV_IEM", "IEM Department", FacilityCategory.ACADEMIC,
+                "Industrial Engineering and Management department — labs, project rooms, and faculty offices.",
+                AccessibilityStatus.YES, AccessibilityStatus.YES,
+                "Ramped south entrance, elevator access within department wing."
+        );
+
+        Location mathsDept = new Location(
+                "RV_MATH", "Mathematics Department", FacilityCategory.ACADEMIC,
+                "Mathematics department — tutorial rooms, research labs, and faculty consultation area.",
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                "Ground-floor ramp access; level corridor linking to common block."
+        );
+
+        Location bioDept = new Location(
+                "RV_BIO", "Biotechnology Department", FacilityCategory.ACADEMIC,
+                "Biotechnology department — bio-labs, genomics research facility, and seminar hall.",
+                AccessibilityStatus.YES, AccessibilityStatus.YES,
+                "Accessible ramp at department entrance; lab floors reachable by elevator."
+        );
+
+        Location eiDept = new Location(
+                "RV_EI", "Electronics and Instrumentation Department", FacilityCategory.ACADEMIC,
+                "EI department — instrumentation labs, control systems, and industrial automation equipment.",
+                AccessibilityStatus.YES, AccessibilityStatus.YES,
+                "West-side ramped entry, lift access to instrumentation lab floors."
+        );
+
+        // Register all 20 nodes
+        map.addLocation(cauevryBlock);
+        map.addLocation(cse);
+        map.addLocation(mingosCafe);
         map.addLocation(mainGate);
-        map.addLocation(adminBlock);
+        map.addLocation(eee);
+        map.addLocation(aimlLibrary);
+        map.addLocation(iemAudi);
+        map.addLocation(ece);
+        map.addLocation(rvUniversity);
+        map.addLocation(parkingSlot);
+        map.addLocation(tennisCourt);
+        map.addLocation(ganeshaTemple);
+        map.addLocation(mainGround);
+        map.addLocation(miniCanteen);
         map.addLocation(library);
-        map.addLocation(cseBlock);
-        map.addLocation(eceBlock);
-        map.addLocation(mechBlock);
-        map.addLocation(auditorium);
-        map.addLocation(foodCourt);
-        map.addLocation(healthCentre);
-        map.addLocation(hostel);
-        map.addLocation(sportsComplex);
-        map.addLocation(heritageWorkshop);
+        map.addLocation(mechLibrary);
+        map.addLocation(iemDept);
+        map.addLocation(mathsDept);
+        map.addLocation(bioDept);
+        map.addLocation(eiDept);
 
-        // 2. Predefined RVCE Campus Routes & Accessibility Scenarios
+        // ============================================================
+        // 2. Campus Route Network (Bidirectional edges)
+        // ============================================================
 
-        // --- Main Gate <-> Admin Block ---
-        // Route 1: Main Paved Boulevard (Ramped, step-free)
+        // --- Main Gate <-> Parking Slot ---
         map.addBidirectionalRoute(
-                mainGate, adminBlock, 150, 3,
+                mainGate, parkingSlot, 80, 2,
+                AccessibilityStatus.NO, AccessibilityStatus.NO,
+                true, false, 0,
+                "Gate to Parking: Level asphalt lane alongside main entrance."
+        );
+
+        // --- Main Gate <-> RV University ---
+        map.addBidirectionalRoute(
+                mainGate, rvUniversity, 150, 3,
                 AccessibilityStatus.NO, AccessibilityStatus.YES,
                 true, false, 0,
-                "Main Campus Boulevard: Smooth asphalt avenue with curb ramps and tactile paving."
+                "Main Boulevard: Smooth asphalt avenue with curb ramps to RV University block."
         );
-        // Route 2: Central Garden Steps Shortcut
+
+        // --- Main Gate <-> Ganesha Temple ---
         map.addBidirectionalRoute(
-                mainGate, adminBlock, 90, 2,
+                mainGate, ganeshaTemple, 120, 3,
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                true, false, 0,
+                "Gate to Temple: Paved level walkway through campus garden to Ganesha Temple."
+        );
+
+        // --- Parking Slot <-> RVCE Main Ground ---
+        map.addBidirectionalRoute(
+                parkingSlot, mainGround, 200, 4,
+                AccessibilityStatus.NO, AccessibilityStatus.NO,
+                true, false, 0,
+                "Parking to Main Ground: Wide service road alongside the ground perimeter."
+        );
+
+        // --- RV University <-> Library ---
+        map.addBidirectionalRoute(
+                rvUniversity, library, 170, 4,
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                true, false, 0,
+                "Gulmohar Walkway: Level canopied corridor from University block to Central Library."
+        );
+
+        // --- RV University <-> Administration (via Shortcut with steps) ---
+        map.addBidirectionalRoute(
+                rvUniversity, library, 110, 2,
                 AccessibilityStatus.YES, AccessibilityStatus.NO,
                 true, false, 0,
-                "Central Garden Steps: Direct shortcut traversing 18 stone steps across lawn."
+                "Quadrangle Shortcut: Faster indoor passage with 12 steps to Library."
         );
 
-        // --- Admin Block <-> Central Library ---
-        // Route 1: Gulmohar Walkway (Stair-free, lift equipped)
+        // --- Library <-> CSE ---
         map.addBidirectionalRoute(
-                adminBlock, library, 170, 4,
+                library, cse, 120, 3,
                 AccessibilityStatus.NO, AccessibilityStatus.YES,
                 true, false, 0,
-                "Gulmohar Walkway: Level paved corridor with canopy and elevator access to library."
+                "Covered Skywalk: Enclosed level skywalk connecting Central Library to CSE Block."
         );
-        // Route 2: Quadrangle Corridor Shortcut
         map.addBidirectionalRoute(
-                adminBlock, library, 110, 2,
-                AccessibilityStatus.YES, AccessibilityStatus.NO,
-                true, false, 0,
-                "Quadrangle Corridor: Faster indoor passage with 12 steps."
-        );
-
-        // --- Central Library <-> CSE & ISE Block ---
-        // Route 1: Covered Skywalk Bridge (Stair-free, elevator connection)
-        map.addBidirectionalRoute(
-                library, cseBlock, 120, 3,
-                AccessibilityStatus.NO, AccessibilityStatus.YES,
-                true, false, 0,
-                "Elevated Skywalk Bridge: Enclosed level skywalk connecting Library and CSE Block with lifts."
-        );
-        // Route 2: Stepped Courtyard Path
-        map.addBidirectionalRoute(
-                library, cseBlock, 80, 2,
+                library, cse, 80, 2,
                 AccessibilityStatus.YES, AccessibilityStatus.NO,
                 true, false, 0,
                 "Courtyard Stepped Path: Direct path with 14 outdoor stone steps."
         );
 
-        // --- Main Gate <-> Central Library (Outer perimeter) ---
-        // Route 1: Outer North Perimeter Road (Longer, flat)
+        // --- Library <-> AIML Departmental Library ---
         map.addBidirectionalRoute(
-                mainGate, library, 350, 7,
-                AccessibilityStatus.NO, AccessibilityStatus.NO,
-                true, false, 0,
-                "North Perimeter Ring Road: Flat tarmac roadway around campus perimeter; no stairs."
-        );
-
-        // --- Admin Block <-> Sir M. Visvesvaraya Auditorium ---
-        // Route 1: Auditorium Plaza Promenade (Level, accessible)
-        map.addBidirectionalRoute(
-                adminBlock, auditorium, 140, 3,
+                library, aimlLibrary, 90, 2,
                 AccessibilityStatus.NO, AccessibilityStatus.YES,
                 true, false, 0,
-                "Auditorium Plaza: Wide concrete promenade with automated ramped entrance."
+                "Library Wing Corridor: Level internal passage from Central Library to AIML Dept Library."
         );
 
-        // --- Main Gate <-> Sir M. Visvesvaraya Auditorium (Shortcut with UNKNOWN accessibility) ---
-        // Route 1: Metro Corridor Walkway (Under construction)
+        // --- CSE <-> EEE Department ---
         map.addBidirectionalRoute(
-                mainGate, auditorium, 180, 4,
-                AccessibilityStatus.UNKNOWN, AccessibilityStatus.UNKNOWN,
-                false, false, 0,
-                "Metro Link Pathway: Short pathway undergoing utility work; accessibility not surveyed."
+                cse, eee, 140, 3,
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                true, false, 0,
+                "Engineering Walkway: Paved flat path linking CSE and EEE department blocks."
         );
 
-        // --- CSE & ISE Block <-> Campus Food Court (Munch Box) ---
-        // Route 1: Student Avenue Walkway (Level, ramped)
+        // --- CSE <-> Mathematics Department ---
         map.addBidirectionalRoute(
-                cseBlock, foodCourt, 130, 3,
+                cse, mathsDept, 100, 2,
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                true, false, 0,
+                "Academic Corridor: Level connecting path between CSE and Maths Department."
+        );
+
+        // --- CSE <-> Mingos Cafe Main Canteen ---
+        map.addBidirectionalRoute(
+                cse, mingosCafe, 130, 3,
                 AccessibilityStatus.NO, AccessibilityStatus.NO,
                 true, false, 0,
-                "Student Avenue: Smooth flagstone path through central student plaza."
+                "Student Avenue: Smooth flagstone path through central student plaza to Mingos Cafe."
         );
-        // Route 2: Terrace Steps Shortcut
         map.addBidirectionalRoute(
-                cseBlock, foodCourt, 85, 2,
+                cse, mingosCafe, 85, 2,
                 AccessibilityStatus.YES, AccessibilityStatus.NO,
                 true, false, 0,
-                "Terrace Stairs: 15-step descending stone staircase to food court patio."
+                "Terrace Steps Shortcut: 15-step descending staircase to canteen patio."
         );
 
-        // --- Campus Food Court <-> Chamundi & Cauvery Hostels ---
-        // Route 1: Hostel Residential Road (Paved, smooth)
+        // --- EEE <-> ECE ---
         map.addBidirectionalRoute(
-                foodCourt, hostel, 250, 5,
+                eee, ece, 110, 2,
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                true, false, 0,
+                "EEE-ECE Corridor: Flat covered walkway connecting Electrical and Electronics departments."
+        );
+
+        // --- EEE <-> Electronics and Instrumentation ---
+        map.addBidirectionalRoute(
+                eee, eiDept, 100, 2,
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                true, false, 0,
+                "EEE to EI: Level campus road between EEE and EI department buildings."
+        );
+
+        // --- ECE <-> Electronics and Instrumentation ---
+        map.addBidirectionalRoute(
+                ece, eiDept, 90, 2,
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                true, false, 0,
+                "ECE-EI Link: Short covered passage connecting ECE and EI labs."
+        );
+
+        // --- ECE <-> IEM Department ---
+        map.addBidirectionalRoute(
+                ece, iemDept, 150, 3,
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                true, false, 0,
+                "ECE to IEM Path: Level paved walkway linking ECE block to IEM department."
+        );
+
+        // --- IEM Department <-> IEM Auditorium ---
+        map.addBidirectionalRoute(
+                iemDept, iemAudi, 80, 2,
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                true, false, 0,
+                "IEM Internal Link: Direct step-free path from IEM Department to IEM Auditorium."
+        );
+
+        // --- IEM Department <-> Biotechnology Department ---
+        map.addBidirectionalRoute(
+                iemDept, bioDept, 140, 3,
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                true, false, 0,
+                "IEM to Bio: Campus path between IEM and Biotechnology department blocks."
+        );
+
+        // --- Biotechnology <-> Mechanical Department Library ---
+        map.addBidirectionalRoute(
+                bioDept, mechLibrary, 120, 3,
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                true, false, 0,
+                "Bio to Mech Library: Paved path linking Biotechnology block to Mechanical Library."
+        );
+
+        // --- Mechanical Library <-> Mathematics Department ---
+        map.addBidirectionalRoute(
+                mechLibrary, mathsDept, 110, 2,
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                true, false, 0,
+                "Mech Lib to Maths: Level corridor joining Mechanical Library and Maths Department."
+        );
+
+        // --- Mathematics Department <-> Mini Canteen ---
+        map.addBidirectionalRoute(
+                mathsDept, miniCanteen, 80, 2,
                 AccessibilityStatus.NO, AccessibilityStatus.NO,
                 true, false, 0,
-                "Hostel Boulevard: Asphalt roadway with curb ramps and bright streetlights."
+                "Maths to Mini Canteen: Short step-free walkway to the departmental mini canteen."
         );
-        // Route 2: Eucalyptus Grove Trail
+
+        // --- Mini Canteen <-> Mingos Cafe ---
         map.addBidirectionalRoute(
-                foodCourt, hostel, 120, 3,
+                miniCanteen, mingosCafe, 100, 2,
+                AccessibilityStatus.NO, AccessibilityStatus.NO,
+                true, false, 0,
+                "Canteen Lane: Flat service lane connecting Mini Canteen and Mingos Cafe."
+        );
+
+        // --- Mingos Cafe <-> Cauvery Block ---
+        map.addBidirectionalRoute(
+                mingosCafe, cauevryBlock, 200, 4,
+                AccessibilityStatus.NO, AccessibilityStatus.NO,
+                true, false, 0,
+                "Hostel Boulevard: Asphalt road with curb ramps from Mingos Cafe to Cauvery Block."
+        );
+        map.addBidirectionalRoute(
+                mingosCafe, cauevryBlock, 110, 3,
                 AccessibilityStatus.YES, AccessibilityStatus.NO,
                 true, false, 0,
-                "Eucalyptus Grove Trail: Unpaved dirt trail with uneven log stairs."
+                "Eucalyptus Trail: Unpaved trail with uneven steps behind canteen to Cauvery Block."
         );
 
-        // --- CSE & ISE Block <-> Health Centre ---
-        // Route 1: East Campus Health Concourse
+        // --- Cauvery Block <-> Tennis Court ---
         map.addBidirectionalRoute(
-                cseBlock, healthCentre, 200, 4,
+                cauevryBlock, tennisCourt, 150, 3,
                 AccessibilityStatus.NO, AccessibilityStatus.NO,
                 true, false, 0,
-                "East Campus Concourse: Level paved sidewalk linking engineering block to clinic."
+                "Hostel to Tennis: Level footpath from Cauvery Block to Tennis Courts."
         );
 
-        // --- Chamundi & Cauvery Hostels <-> Health Centre ---
-        // Route 1: Clinic Direct Walkway
+        // --- Tennis Court <-> RVCE Main Ground ---
         map.addBidirectionalRoute(
-                hostel, healthCentre, 170, 3,
+                tennisCourt, mainGround, 180, 4,
                 AccessibilityStatus.NO, AccessibilityStatus.NO,
                 true, false, 0,
-                "Clinic Walkway: Gentle slope concrete path linking hostels to medical centre."
+                "Sports Path: Flat paved path linking Tennis Courts to the Main Ground."
         );
 
-        // --- Chamundi & Cauvery Hostels <-> Sports Complex ---
-        // Route 1: RVCE Campus Electric Buggy Shuttle (Transfer required: 5 min connection)
+        // --- Main Ground <-> Ganesha Temple ---
         map.addBidirectionalRoute(
-                hostel, sportsComplex, 460, 3,
+                mainGround, ganeshaTemple, 140, 3,
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                true, false, 0,
+                "Ground to Temple: Paved walkway from Main Ground to Ganesha Temple."
+        );
+
+        // --- Ganesha Temple <-> RV University ---
+        map.addBidirectionalRoute(
+                ganeshaTemple, rvUniversity, 100, 2,
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                true, false, 0,
+                "Temple to University: Short level path from Temple to RV University block."
+        );
+
+        // --- AIML Library <-> CSE ---
+        map.addBidirectionalRoute(
+                aimlLibrary, cse, 60, 1,
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                true, false, 0,
+                "AIML Library to CSE: Internal department corridor directly connecting AIML Library to CSE block."
+        );
+
+        // --- Main Gate <-> Main Ground (perimeter road — longer, flat) ---
+        map.addBidirectionalRoute(
+                mainGate, mainGround, 450, 9,
+                AccessibilityStatus.NO, AccessibilityStatus.NO,
+                true, false, 0,
+                "Outer Perimeter Road: Flat tarmac road around campus perimeter from gate to main ground."
+        );
+
+        // --- Cauvery Block <-> Library (via electric buggy shuttle) ---
+        map.addBidirectionalRoute(
+                cauevryBlock, library, 500, 4,
                 AccessibilityStatus.NO, AccessibilityStatus.YES,
                 true, true, 5,
-                "RVCE Electric Buggy Shuttle: Wheelchair-friendly campus e-cart with 5-minute depot connection."
-        );
-        // Route 2: Cricket Oval Perimeter Walkway (Direct, longer walking, 0 transfers)
-        map.addBidirectionalRoute(
-                hostel, sportsComplex, 390, 8,
-                AccessibilityStatus.NO, AccessibilityStatus.NO,
-                true, false, 0,
-                "Cricket Oval Perimeter: Level asphalt sidewalk around the sports field; zero transfers."
+                "RVCE Electric Buggy Shuttle: Wheelchair-friendly campus e-cart with 5-min depot connection."
         );
 
-        // --- Health Centre <-> Heritage Mechanical Workshop ---
-        // Note: Demonstrates Scenario where NO fully verified accessible route exists!
-        // Route 1: 1963 Historic Stone Steps
+        // --- Parking Slot <-> Main Gate (service lane, unverified) ---
         map.addBidirectionalRoute(
-                healthCentre, heritageWorkshop, 105, 2,
-                AccessibilityStatus.YES, AccessibilityStatus.NO,
-                true, false, 0,
-                "1963 Historic Stone Stairway: 28 steep stone steps without handrails."
-        );
-        // Route 2: Rear Service Delivery Alley (Unverified accessibility)
-        map.addBidirectionalRoute(
-                healthCentre, heritageWorkshop, 155, 3,
+                parkingSlot, rvUniversity, 180, 4,
                 AccessibilityStatus.UNKNOWN, AccessibilityStatus.UNKNOWN,
                 false, false, 0,
-                "Workshop Service Alley: Unpaved rear loading lane; obstacles and steps unverified."
+                "Service Lane: Partially surveyed rear lane linking parking to university block."
+        );
+
+        // --- IEM Auditorium <-> Main Ground ---
+        map.addBidirectionalRoute(
+                iemAudi, mainGround, 200, 4,
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                true, false, 0,
+                "Auditorium to Ground: Paved plaza path from IEM Auditorium to Main Ground."
+        );
+
+        // --- EI Department <-> Biotechnology ---
+        map.addBidirectionalRoute(
+                eiDept, bioDept, 130, 3,
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                true, false, 0,
+                "EI to Bio: Level campus road between EI and Biotechnology department buildings."
+        );
+
+        // --- Mathematics <-> EEE ---
+        map.addBidirectionalRoute(
+                mathsDept, eee, 120, 3,
+                AccessibilityStatus.NO, AccessibilityStatus.YES,
+                true, false, 0,
+                "Maths to EEE: Academic block connector path between Mathematics and EEE departments."
         );
 
         return map;

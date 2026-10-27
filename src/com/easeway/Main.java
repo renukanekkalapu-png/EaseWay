@@ -11,12 +11,13 @@ import java.util.Scanner;
 
 /**
  * Main application class for EaseWay — RV College of Engineering (RVCE), Mysuru Road, Bengaluru.
- * 
- * Provides an interactive terminal interface for managing user accessibility profiles,
- * finding accessible campus pathways, and recommending facilities.
+ *
+ * Provides an interactive terminal interface supporting:
+ *  - Multi-user registration, login, and logout
+ *  - Independent per-user accessibility profiles persisted to disk
+ *  - Accessible campus route finding and facility recommendations
  */
 public class Main {
-    private static final String PROFILE_FILE = UserProfile.DEFAULT_FILE;
 
     private final CampusMap campusMap;
     private final RouteEngine routeEngine;
@@ -24,10 +25,11 @@ public class Main {
     private UserProfile currentProfile;
 
     public Main() {
-        this.campusMap = CampusMap.createRVCEMap();
-        this.routeEngine = new RouteEngine(campusMap);
-        this.scanner = new Scanner(System.in);
-        this.currentProfile = UserProfile.loadFromFile(PROFILE_FILE);
+        this.campusMap    = CampusMap.createRVCEMap();
+        this.routeEngine  = new RouteEngine(campusMap);
+        this.scanner      = new Scanner(System.in);
+        this.currentProfile = null;
+        UserProfile.ensureUsersDirExists();
     }
 
     public static void main(String[] args) {
@@ -37,37 +39,42 @@ public class Main {
 
     public void run() {
         printBanner();
-        printActiveProfileCard();
 
+        // Show auth menu until a user logs in
+        boolean loggedIn = false;
+        while (!loggedIn) {
+            loggedIn = showAuthMenu();
+        }
+
+        // Main application loop — runs until user logs out or exits
         boolean running = true;
         while (running) {
+            printActiveProfileCard();
             printMainMenu();
-            int choice = readInt("Choose an option (1-8): ", 1, 8);
+            int choice = readInt("Choose an option (1-9): ", 1, 9);
             System.out.println();
 
             switch (choice) {
-                case 1:
-                    viewProfileDetails();
-                    break;
-                case 2:
-                    editProfileDetails();
-                    break;
-                case 3:
-                    updateAccessibilityPreferences();
-                    break;
-                case 4:
-                    findAccessibleRoute();
-                    break;
-                case 5:
-                    recommendCampusFacilities();
-                    break;
-                case 6:
-                    viewRVCELocationsAndMap();
-                    break;
-                case 7:
-                    resetProfileFlow();
-                    break;
+                case 1: viewProfileDetails();           break;
+                case 2: editProfileDetails();           break;
+                case 3: updateAccessibilityPreferences(); break;
+                case 4: findAccessibleRoute();          break;
+                case 5: recommendCampusFacilities();    break;
+                case 6: viewRVCELocationsAndMap();      break;
+                case 7: resetProfileFlow();             break;
                 case 8:
+                    // Logout
+                    System.out.println("========================================================================");
+                    System.out.println("  Logged out. Goodbye, " + currentProfile.getFullName() + "!");
+                    System.out.println("========================================================================");
+                    currentProfile = null;
+                    // Return to auth menu
+                    boolean reLogin = false;
+                    while (!reLogin) {
+                        reLogin = showAuthMenu();
+                    }
+                    break;
+                case 9:
                     running = false;
                     System.out.println("========================================================================");
                     System.out.println("  Thank you for using EaseWay (RVCE Campus). Safe travels across campus!");
@@ -77,9 +84,185 @@ public class Main {
         }
     }
 
-    // ----------------------------------------------------
+    // ====================================================================
+    // Authentication Menu
+    // ====================================================================
+
+    /**
+     * Displays the auth menu (Login / Register / Guest / Exit).
+     * Returns true when a user is successfully authenticated.
+     */
+    private boolean showAuthMenu() {
+        System.out.println();
+        System.out.println("========== EASEWAY — USER AUTHENTICATION ==========");
+        System.out.println("  1. Login with existing account");
+        System.out.println("  2. Register a new account");
+        System.out.println("  3. Continue as Guest (no profile saved)");
+        System.out.println("  4. Exit EaseWay");
+        System.out.println("===================================================");
+
+        int choice = readInt("Choose an option (1-4): ", 1, 4);
+        System.out.println();
+
+        switch (choice) {
+            case 1: return loginFlow();
+            case 2: return registerFlow();
+            case 3: return guestFlow();
+            case 4:
+                System.out.println("========================================================================");
+                System.out.println("  Thank you for using EaseWay (RVCE Campus). Goodbye!");
+                System.out.println("========================================================================");
+                System.exit(0);
+        }
+        return false;
+    }
+
+    /**
+     * Handles user login. Returns true on success.
+     */
+    private boolean loginFlow() {
+        System.out.println("=== LOGIN ===");
+
+        List<String> users = UserProfile.listRegisteredUsers();
+        if (users.isEmpty()) {
+            System.out.println("[Notice] No registered users found. Please register first.");
+            return false;
+        }
+
+        System.out.println("Registered accounts: " + String.join(", ", users));
+        System.out.println();
+
+        String username = readString("Enter username: ");
+        if (username.isEmpty()) {
+            System.out.println("Username cannot be empty.");
+            return false;
+        }
+
+        if (!UserProfile.userExists(username)) {
+            System.out.println("[Error] No account found with username '" + username + "'. Please register first.");
+            return false;
+        }
+
+        // Load the profile to check password
+        UserProfile loaded = UserProfile.loadUser(username);
+        if (loaded == null) {
+            System.out.println("[Error] Could not load profile for '" + username + "'.");
+            return false;
+        }
+
+        String password = readPassword("Enter password: ");
+        if (!loaded.checkPassword(password)) {
+            System.out.println("[Error] Incorrect password. Login failed.");
+            return false;
+        }
+
+        this.currentProfile = loaded;
+        System.out.println();
+        System.out.println("[Success] Welcome back, " + currentProfile.getFullName() + "!");
+        System.out.println("------------------------------------------------------------------------");
+        return true;
+    }
+
+    /**
+     * Handles new user registration. Returns true on success.
+     */
+    private boolean registerFlow() {
+        System.out.println("=== REGISTER NEW ACCOUNT ===");
+        System.out.println("Create your EaseWay login credentials and profile.");
+        System.out.println();
+
+        // Choose username
+        String username;
+        while (true) {
+            username = readString("Choose a username (letters/numbers/underscore, no spaces): ");
+            if (username.isEmpty()) {
+                System.out.println("Username cannot be empty.");
+                continue;
+            }
+            if (!username.matches("[a-zA-Z0-9_]+")) {
+                System.out.println("Username may only contain letters, numbers, and underscores.");
+                continue;
+            }
+            if (UserProfile.userExists(username)) {
+                System.out.println("[Error] Username '" + username + "' is already taken. Please choose another.");
+                continue;
+            }
+            break;
+        }
+
+        // Choose password
+        String password;
+        while (true) {
+            password = readPassword("Choose a password (min 4 characters): ");
+            if (password.length() < 4) {
+                System.out.println("Password must be at least 4 characters.");
+                continue;
+            }
+            String confirm = readPassword("Confirm password: ");
+            if (!password.equals(confirm)) {
+                System.out.println("Passwords do not match. Try again.");
+                continue;
+            }
+            break;
+        }
+
+        // Create the new profile
+        UserProfile newProfile = new UserProfile(username, password);
+
+        System.out.println();
+        System.out.println("--- Personal Details (press Enter to use default value) ---");
+
+        String name = readString("Full Name [" + UserProfile.DEFAULT_NAME + "]: ");
+        if (!name.isEmpty()) newProfile.setFullName(name);
+
+        System.out.println("Select Role:");
+        System.out.println("  1. Student  2. Faculty  3. Mobility-Impaired Student  4. Wheelchair User  5. Visitor / Guest");
+        int roleChoice = readInt("Enter role (1-5): ", 1, 5);
+        String[] roles = {"Student", "Faculty", "Mobility-Impaired Student", "Wheelchair User", "Visitor / Guest"};
+        newProfile.setUserRole(roles[roleChoice - 1]);
+
+        String usn = readString("USN / College ID [" + UserProfile.DEFAULT_USN + "]: ");
+        if (!usn.isEmpty()) newProfile.setUsnOrId(usn);
+
+        String contact = readString("Emergency Contact [" + UserProfile.DEFAULT_CONTACT + "]: ");
+        if (!contact.isEmpty()) newProfile.setEmergencyContact(contact);
+
+        System.out.println();
+        System.out.println("--- Accessibility Preferences (defaults applied — edit anytime from the main menu) ---");
+        System.out.printf("  Avoid Stairs: Yes | Prefer Lifts: Yes | Minimize Walking: No | Max Distance: %dm%n",
+                UserProfile.DEFAULT_MAX_DISTANCE);
+
+        // Save the new profile
+        boolean saved = newProfile.save();
+        System.out.println();
+        if (saved) {
+            System.out.println("[Success] Account registered and profile saved.");
+        } else {
+            System.out.println("[Notice] Account created in session only (disk save failed).");
+        }
+
+        this.currentProfile = newProfile;
+        System.out.println("Welcome to EaseWay, " + currentProfile.getFullName() + "!");
+        System.out.println("------------------------------------------------------------------------");
+        return true;
+    }
+
+    /**
+     * Sets up a temporary guest profile (not saved to disk). Returns true always.
+     */
+    private boolean guestFlow() {
+        this.currentProfile = new UserProfile("guest", "");
+        this.currentProfile.setFullName("Guest User");
+        this.currentProfile.setUserRole("Visitor / Guest");
+        this.currentProfile.setUsnOrId("GUEST");
+        System.out.println("[Guest Mode] Continuing without account. Preferences will NOT be saved.");
+        System.out.println("------------------------------------------------------------------------");
+        return true;
+    }
+
+    // ====================================================================
     // UI Banners and Summaries
-    // ----------------------------------------------------
+    // ====================================================================
 
     private void printBanner() {
         System.out.println("========================================================================");
@@ -90,9 +273,12 @@ public class Main {
     }
 
     private void printActiveProfileCard() {
-        System.out.println("Active User: " + currentProfile.getFullName() +
-                " | Role: " + currentProfile.getUserRole() +
-                " | USN: " + currentProfile.getUsnOrId());
+        System.out.println();
+        System.out.printf("Active User: %s (@%s) | Role: %s | USN: %s%n",
+                currentProfile.getFullName(),
+                currentProfile.getUsername(),
+                currentProfile.getUserRole(),
+                currentProfile.getUsnOrId());
         System.out.printf("Preferences: Avoid Stairs: %s | Prefer Lifts: %s | Min Walk: %s | Max Dist: %dm%n",
                 currentProfile.isAvoidStairs() ? "Yes" : "No",
                 currentProfile.isPreferLifts() ? "Yes" : "No",
@@ -111,18 +297,22 @@ public class Main {
         System.out.println("5. Recommend Campus Facilities");
         System.out.println("6. View RVCE Campus Locations & Map");
         System.out.println("7. Reset Profile to Defaults");
-        System.out.println("8. Exit");
+        System.out.println("8. Logout (Switch User)");
+        System.out.println("9. Exit");
         System.out.println("============================================");
     }
 
-    // ----------------------------------------------------
+    // ====================================================================
     // 1. View Profile
-    // ----------------------------------------------------
+    // ====================================================================
 
     private void viewProfileDetails() {
         System.out.println("========================================================================");
         System.out.println("            CURRENT USER ACCESSIBILITY PROFILE & PREFERENCES            ");
         System.out.println("========================================================================");
+        System.out.println("  [Account Details]");
+        System.out.printf("  - Username                           : %s%n", currentProfile.getUsername());
+        System.out.println();
         System.out.println("  [Personal Details]");
         System.out.printf("  - Full Name                          : %s%n", currentProfile.getFullName());
         System.out.printf("  - User Role / Category               : %s%n", currentProfile.getUserRole());
@@ -137,14 +327,14 @@ public class Main {
         System.out.printf("  - Max Preferred Walking Distance     : %d meters%n", currentProfile.getMaxWalkingDistanceMeters());
         System.out.printf("  - Extra Transfer Time Tolerance      : %d minutes%n", currentProfile.getExtraTransferTimeMinutes());
         System.out.println("------------------------------------------------------------------------");
-        System.out.println("  Persistence Storage File             : " + PROFILE_FILE);
+        System.out.println("  Persistence Storage File             : " + currentProfile.getUserFilePath());
         System.out.println("========================================================================");
         pause();
     }
 
-    // ----------------------------------------------------
+    // ====================================================================
     // 2. Edit Profile Details
-    // ----------------------------------------------------
+    // ====================================================================
 
     private void editProfileDetails() {
         UserProfile draft = currentProfile.copy();
@@ -158,11 +348,12 @@ public class Main {
             System.out.printf("  2. User Role            : %s%n", draft.getUserRole());
             System.out.printf("  3. USN / College ID     : %s%n", draft.getUsnOrId());
             System.out.printf("  4. Emergency Contact    : %s%n", draft.getEmergencyContact());
-            System.out.println("  5. Save Changes & Return");
-            System.out.println("  6. Cancel & Discard Changes");
+            System.out.printf("  5. Change Password%n");
+            System.out.println("  6. Save Changes & Return");
+            System.out.println("  7. Cancel & Discard Changes");
             System.out.println("------------------------------------------------------------------------");
 
-            int choice = readInt("Select field to edit (1-6): ", 1, 6);
+            int choice = readInt("Select field to edit (1-7): ", 1, 7);
             System.out.println();
 
             switch (choice) {
@@ -195,21 +386,43 @@ public class Main {
                     }
                     break;
                 case 5:
-                    if (readBoolean("Save updated profile details to disk? (Yes/No): ")) {
-                        this.currentProfile = draft;
-                        boolean saved = this.currentProfile.saveToFile(PROFILE_FILE);
+                    if (currentProfile.getUsername().equals("guest")) {
+                        System.out.println("[Notice] Password change is not available in guest mode.");
+                    } else {
+                        String oldPass = readPassword("Enter current password: ");
+                        if (!draft.checkPassword(oldPass)) {
+                            System.out.println("[Error] Incorrect current password. Password not changed.");
+                        } else {
+                            String newPass = readPassword("Enter new password (min 4 chars): ");
+                            if (newPass.length() < 4) {
+                                System.out.println("New password too short. Password not changed.");
+                            } else {
+                                String confirm = readPassword("Confirm new password: ");
+                                if (!newPass.equals(confirm)) {
+                                    System.out.println("Passwords do not match. Password not changed.");
+                                } else {
+                                    draft.setPassword(newPass);
+                                    System.out.println("-> Password updated successfully.");
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case 6:
+                    this.currentProfile = draft;
+                    if (!currentProfile.getUsername().equals("guest")) {
+                        boolean saved = this.currentProfile.save();
                         if (saved) {
-                            System.out.println("[Success] Profile details saved to " + PROFILE_FILE);
+                            System.out.println("[Success] Profile details saved to " + currentProfile.getUserFilePath());
                         } else {
                             System.out.println("[Notice] Profile updated in session (could not write to disk).");
                         }
                     } else {
-                        this.currentProfile = draft;
-                        System.out.println("Saved for current session only.");
+                        System.out.println("Saved for current session only (guest mode).");
                     }
                     editing = false;
                     break;
-                case 6:
+                case 7:
                     System.out.println("Discarded changes.");
                     editing = false;
                     break;
@@ -218,9 +431,9 @@ public class Main {
         }
     }
 
-    // ----------------------------------------------------
+    // ====================================================================
     // 3. Update Accessibility Preferences
-    // ----------------------------------------------------
+    // ====================================================================
 
     private void updateAccessibilityPreferences() {
         UserProfile draft = currentProfile.copy();
@@ -275,17 +488,16 @@ public class Main {
                     System.out.println("-> 'Extra Transfer Tolerance' set to: " + transMins + " minutes");
                     break;
                 case 7:
-                    if (readBoolean("Confirm saving updated preferences to disk? (Yes/No): ")) {
-                        this.currentProfile = draft;
-                        boolean saved = this.currentProfile.saveToFile(PROFILE_FILE);
+                    this.currentProfile = draft;
+                    if (!currentProfile.getUsername().equals("guest")) {
+                        boolean saved = this.currentProfile.save();
                         if (saved) {
-                            System.out.println("[Success] Preferences saved successfully to " + PROFILE_FILE);
+                            System.out.println("[Success] Preferences saved successfully to " + currentProfile.getUserFilePath());
                         } else {
-                            System.out.println("[Notice] Preferences active for this session.");
+                            System.out.println("[Notice] Preferences active for this session (disk save failed).");
                         }
                     } else {
-                        this.currentProfile = draft;
-                        System.out.println("Preferences retained for current session.");
+                        System.out.println("Preferences retained for current session (guest mode — not saved).");
                     }
                     editing = false;
                     break;
@@ -298,9 +510,9 @@ public class Main {
         }
     }
 
-    // ----------------------------------------------------
+    // ====================================================================
     // 4. Find Accessible Route (RVCE Campus)
-    // ----------------------------------------------------
+    // ====================================================================
 
     private void findAccessibleRoute() {
         System.out.println("========================================================================");
@@ -441,9 +653,9 @@ public class Main {
         }
     }
 
-    // ----------------------------------------------------
+    // ====================================================================
     // 5. Recommend Campus Facilities
-    // ----------------------------------------------------
+    // ====================================================================
 
     private void recommendCampusFacilities() {
         System.out.println("========================================================================");
@@ -454,7 +666,7 @@ public class Main {
         printLocationNumberedList(locations);
 
         System.out.println();
-        Location defaultStart = campusMap.findLocation("Main Gate (Mysuru Road)");
+        Location defaultStart = campusMap.findLocation("RVCE Vidyanikethan Main Gate");
         System.out.println("Select your starting location (press Enter for Main Gate):");
         Location origin = promptForLocation("Enter Starting Location: ", locations, defaultStart);
 
@@ -545,9 +757,9 @@ public class Main {
         System.out.println("=========================================================================================");
     }
 
-    // ----------------------------------------------------
+    // ====================================================================
     // 6. View RVCE Campus Locations & Map
-    // ----------------------------------------------------
+    // ====================================================================
 
     private void viewRVCELocationsAndMap() {
         System.out.println("=========================================================================================");
@@ -577,24 +789,31 @@ public class Main {
         pause();
     }
 
-    // ----------------------------------------------------
+    // ====================================================================
     // 7. Reset Profile Flow
-    // ----------------------------------------------------
+    // ====================================================================
 
     private void resetProfileFlow() {
         System.out.println("========================================================================");
         System.out.println("                     RESET PROFILE TO DEFAULTS                          ");
         System.out.println("========================================================================");
-        System.out.println("This action will restore default user identity and accessibility settings:");
+        System.out.println("This action will restore default accessibility settings for @" + currentProfile.getUsername() + ":");
         System.out.println("  - Name: " + UserProfile.DEFAULT_NAME + " | Role: " + UserProfile.DEFAULT_ROLE);
         System.out.println("  - Avoid Stairs: Yes | Prefer Lifts: Yes | Minimize Walking: No");
         System.out.println("  - Allow Transfers: Yes | Max Walking Distance: 500m | Extra Transfer Time: 5 min");
+        System.out.println("  Note: Your username and password will NOT be changed.");
         System.out.println();
 
         boolean confirm = readBoolean("Are you sure you want to reset your profile to defaults? (Yes/No): ");
         if (confirm) {
+            String savedUsername = currentProfile.getUsername();
+            String savedPassword = currentProfile.getPassword();
             this.currentProfile.resetToDefaults();
-            this.currentProfile.saveToFile(PROFILE_FILE);
+            this.currentProfile.setUsername(savedUsername);
+            this.currentProfile.setPassword(savedPassword);
+            if (!currentProfile.getUsername().equals("guest")) {
+                this.currentProfile.save();
+            }
             System.out.println("[Success] User profile and accessibility preferences reset to default values.");
         } else {
             System.out.println("Reset cancelled. Current profile preserved.");
@@ -602,14 +821,14 @@ public class Main {
         pause();
     }
 
-    // ----------------------------------------------------
+    // ====================================================================
     // Input Helpers & Parsers
-    // ----------------------------------------------------
+    // ====================================================================
 
     private void printLocationNumberedList(List<Location> locations) {
         System.out.println("Available Campus Locations:");
         for (int i = 0; i < locations.size(); i++) {
-            System.out.printf("  %2d. %-36s (%s)%n", (i + 1), locations.get(i).getName(), locations.get(i).getCategory().name());
+            System.out.printf("  %2d. %-40s (%s)%n", (i + 1), locations.get(i).getName(), locations.get(i).getCategory().name());
         }
     }
 
@@ -683,6 +902,22 @@ public class Main {
     private String readString(String prompt) {
         System.out.print(prompt);
         return scanner.nextLine().trim();
+    }
+
+    /**
+     * Reads a password. Uses Console for masked input when available (terminal sessions);
+     * falls back to plain Scanner readline in IDE/pipe environments.
+     */
+    private String readPassword(String prompt) {
+        java.io.Console console = System.console();
+        if (console != null) {
+            char[] chars = console.readPassword(prompt);
+            return chars == null ? "" : new String(chars);
+        } else {
+            // Fallback: plain text (IDE / redirected input)
+            System.out.print(prompt);
+            return scanner.nextLine().trim();
+        }
     }
 
     private void pause() {

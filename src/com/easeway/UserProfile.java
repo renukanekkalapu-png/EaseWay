@@ -6,31 +6,51 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
  * Stores user profile identity details and personal accessibility preferences
  * for navigating the RV College of Engineering (RVCE) Mysuru Road campus.
- * 
+ *
+ * Multi-user support: Each user has an independent profile stored as a separate
+ * properties file in the "users/" directory. Passwords are stored as plain text
+ * (suitable for a console demo application).
+ *
  * Includes built-in local persistence (load, save, reset) using a properties file,
  * with error handling for missing or corrupted preference values.
  */
 public class UserProfile {
+    /** Directory where individual user profile files are stored. */
+    public static final String USERS_DIR = "users";
+
+    /** Legacy single-profile file path (retained for compatibility). */
     public static final String DEFAULT_FILE = "rvce_easeway_profile.properties";
 
     // Defaults for Profile Identity
-    public static final String DEFAULT_NAME = "RVCE Student";
-    public static final String DEFAULT_ROLE = "Student";
-    public static final String DEFAULT_USN = "1RV22CS001";
+    public static final String DEFAULT_NAME  = "RVCE Student";
+    public static final String DEFAULT_ROLE  = "Student";
+    public static final String DEFAULT_USN   = "1RV22CS001";
     public static final String DEFAULT_CONTACT = "+91 98765 43210";
 
     // Defaults for Accessibility Preferences
-    public static final boolean DEFAULT_AVOID_STAIRS = true;
-    public static final boolean DEFAULT_PREFER_LIFTS = true;
+    public static final boolean DEFAULT_AVOID_STAIRS    = true;
+    public static final boolean DEFAULT_PREFER_LIFTS    = true;
     public static final boolean DEFAULT_MINIMIZE_WALKING = false;
-    public static final boolean DEFAULT_ALLOW_TRANSFER = true;
-    public static final int DEFAULT_MAX_DISTANCE = 500;
-    public static final int DEFAULT_EXTRA_TRANSFER_TIME = 5;
+    public static final boolean DEFAULT_ALLOW_TRANSFER  = true;
+    public static final int     DEFAULT_MAX_DISTANCE    = 500;
+    public static final int     DEFAULT_EXTRA_TRANSFER_TIME = 5;
+
+    // ----------------------------------------------------------------
+    // Fields
+    // ----------------------------------------------------------------
+
+    /** Username (login identifier). */
+    private String username;
+
+    /** Password (plain text for console application). */
+    private String password;
 
     // Profile Details
     private String fullName;
@@ -46,28 +66,75 @@ public class UserProfile {
     private int maxWalkingDistanceMeters;
     private int extraTransferTimeMinutes;
 
+    // ----------------------------------------------------------------
+    // Constructors
+    // ----------------------------------------------------------------
+
     public UserProfile() {
+        this.username = "guest";
+        this.password = "";
         resetToDefaults();
     }
 
+    public UserProfile(String username, String password) {
+        this.username = username.trim().toLowerCase();
+        this.password = password;
+        resetToDefaults();
+    }
+
+    // ----------------------------------------------------------------
+    // Reset
+    // ----------------------------------------------------------------
+
     /**
      * Resets both personal identity details and accessibility preferences to defaults.
+     * Username and password are NOT reset by this method.
      */
     public final void resetToDefaults() {
-        this.fullName = DEFAULT_NAME;
-        this.userRole = DEFAULT_ROLE;
-        this.usnOrId = DEFAULT_USN;
+        this.fullName         = DEFAULT_NAME;
+        this.userRole         = DEFAULT_ROLE;
+        this.usnOrId          = DEFAULT_USN;
         this.emergencyContact = DEFAULT_CONTACT;
 
-        this.avoidStairs = DEFAULT_AVOID_STAIRS;
-        this.preferLifts = DEFAULT_PREFER_LIFTS;
-        this.minimizeWalking = DEFAULT_MINIMIZE_WALKING;
-        this.allowExtraTransferTime = DEFAULT_ALLOW_TRANSFER;
+        this.avoidStairs             = DEFAULT_AVOID_STAIRS;
+        this.preferLifts             = DEFAULT_PREFER_LIFTS;
+        this.minimizeWalking         = DEFAULT_MINIMIZE_WALKING;
+        this.allowExtraTransferTime  = DEFAULT_ALLOW_TRANSFER;
         this.maxWalkingDistanceMeters = DEFAULT_MAX_DISTANCE;
         this.extraTransferTimeMinutes = DEFAULT_EXTRA_TRANSFER_TIME;
     }
 
-    // --- Profile Identity Getters & Setters ---
+    // ----------------------------------------------------------------
+    // Username / Password
+    // ----------------------------------------------------------------
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        if (username != null && !username.trim().isEmpty()) {
+            this.username = username.trim().toLowerCase();
+        }
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        if (password != null) {
+            this.password = password;
+        }
+    }
+
+    public boolean checkPassword(String input) {
+        return this.password != null && this.password.equals(input);
+    }
+
+    // ----------------------------------------------------------------
+    // Profile Identity Getters & Setters
+    // ----------------------------------------------------------------
 
     public String getFullName() {
         return fullName;
@@ -109,7 +176,9 @@ public class UserProfile {
         }
     }
 
-    // --- Accessibility Preferences Getters & Setters ---
+    // ----------------------------------------------------------------
+    // Accessibility Preferences Getters & Setters
+    // ----------------------------------------------------------------
 
     public boolean isAvoidStairs() {
         return avoidStairs;
@@ -171,25 +240,92 @@ public class UserProfile {
         }
     }
 
+    // ----------------------------------------------------------------
+    // Copy
+    // ----------------------------------------------------------------
+
     public UserProfile copy() {
         UserProfile clone = new UserProfile();
-        clone.fullName = this.fullName;
-        clone.userRole = this.userRole;
-        clone.usnOrId = this.usnOrId;
-        clone.emergencyContact = this.emergencyContact;
-        clone.avoidStairs = this.avoidStairs;
-        clone.preferLifts = this.preferLifts;
-        clone.minimizeWalking = this.minimizeWalking;
-        clone.allowExtraTransferTime = this.allowExtraTransferTime;
+        clone.username                = this.username;
+        clone.password                = this.password;
+        clone.fullName                = this.fullName;
+        clone.userRole                = this.userRole;
+        clone.usnOrId                 = this.usnOrId;
+        clone.emergencyContact        = this.emergencyContact;
+        clone.avoidStairs             = this.avoidStairs;
+        clone.preferLifts             = this.preferLifts;
+        clone.minimizeWalking         = this.minimizeWalking;
+        clone.allowExtraTransferTime  = this.allowExtraTransferTime;
         clone.maxWalkingDistanceMeters = this.maxWalkingDistanceMeters;
         clone.extraTransferTimeMinutes = this.extraTransferTimeMinutes;
         return clone;
     }
 
-    // --- Persistence Methods (Load, Save, Reset) ---
+    // ----------------------------------------------------------------
+    // Multi-User File Helpers
+    // ----------------------------------------------------------------
 
     /**
-     * Loads profile identity and preferences from local properties file.
+     * Returns the file path for this user's profile in the users/ directory.
+     */
+    public String getUserFilePath() {
+        return USERS_DIR + File.separator + username + ".properties";
+    }
+
+    /**
+     * Ensures the users/ directory exists.
+     */
+    public static void ensureUsersDirExists() {
+        File dir = new File(USERS_DIR);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+    }
+
+    /**
+     * Returns true if a user with the given username already has a saved profile file.
+     */
+    public static boolean userExists(String username) {
+        if (username == null || username.trim().isEmpty()) return false;
+        String path = USERS_DIR + File.separator + username.trim().toLowerCase() + ".properties";
+        return new File(path).exists();
+    }
+
+    /**
+     * Lists all registered usernames (file basenames without extension) in the users/ dir.
+     */
+    public static List<String> listRegisteredUsers() {
+        List<String> names = new ArrayList<>();
+        File dir = new File(USERS_DIR);
+        if (!dir.exists() || !dir.isDirectory()) return names;
+        File[] files = dir.listFiles((d, n) -> n.endsWith(".properties"));
+        if (files == null) return names;
+        for (File f : files) {
+            String n = f.getName().replace(".properties", "");
+            names.add(n);
+        }
+        java.util.Collections.sort(names);
+        return names;
+    }
+
+    // ----------------------------------------------------------------
+    // Persistence Methods (Load, Save, Reset)
+    // ----------------------------------------------------------------
+
+    /**
+     * Loads a user profile from the users/ directory by username.
+     * Returns null if the file does not exist.
+     */
+    public static UserProfile loadUser(String username) {
+        if (username == null || username.trim().isEmpty()) return null;
+        String filePath = USERS_DIR + File.separator + username.trim().toLowerCase() + ".properties";
+        File file = new File(filePath);
+        if (!file.exists()) return null;
+        return loadFromFile(filePath);
+    }
+
+    /**
+     * Loads profile identity and preferences from a local properties file.
      * Recovers gracefully with sensible defaults if file is missing or values are corrupt.
      */
     public static UserProfile loadFromFile(String filePath) {
@@ -205,6 +341,8 @@ public class UserProfile {
         try (InputStream in = new FileInputStream(file)) {
             props.load(in);
 
+            profile.setUsername(props.getProperty("auth.username", "guest"));
+            profile.setPassword(props.getProperty("auth.password", ""));
             profile.setFullName(props.getProperty("user.fullName", DEFAULT_NAME));
             profile.setUserRole(props.getProperty("user.role", DEFAULT_ROLE));
             profile.setUsnOrId(props.getProperty("user.usnOrId", DEFAULT_USN));
@@ -224,10 +362,12 @@ public class UserProfile {
     }
 
     /**
-     * Persists profile identity and accessibility preferences to the specified file.
+     * Persists profile identity and accessibility preferences to the specified file path.
      */
     public boolean saveToFile(String filePath) {
         Properties props = new Properties();
+        props.setProperty("auth.username", username);
+        props.setProperty("auth.password", password);
         props.setProperty("user.fullName", fullName);
         props.setProperty("user.role", userRole);
         props.setProperty("user.usnOrId", usnOrId);
@@ -241,13 +381,25 @@ public class UserProfile {
         props.setProperty("pref.extraTransferTimeMinutes", String.valueOf(extraTransferTimeMinutes));
 
         try (OutputStream out = new FileOutputStream(filePath)) {
-            props.store(out, "EaseWay RVCE Mysuru Road Campus - User Accessibility Profile");
+            props.store(out, "EaseWay RVCE Campus - User Accessibility Profile [" + username + "]");
             return true;
         } catch (IOException e) {
             System.err.println("[Error] Failed to save profile to " + filePath + ": " + e.getMessage());
             return false;
         }
     }
+
+    /**
+     * Saves this profile to its user-specific file in the users/ directory.
+     */
+    public boolean save() {
+        ensureUsersDirExists();
+        return saveToFile(getUserFilePath());
+    }
+
+    // ----------------------------------------------------------------
+    // Internal Parsers
+    // ----------------------------------------------------------------
 
     private static boolean parseBooleanSafe(String val, boolean def) {
         if (val == null) return def;
@@ -265,6 +417,10 @@ public class UserProfile {
             return def;
         }
     }
+
+    // ----------------------------------------------------------------
+    // Object overrides
+    // ----------------------------------------------------------------
 
     @Override
     public String toString() {
