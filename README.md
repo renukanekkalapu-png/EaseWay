@@ -255,3 +255,15 @@ Running `java -cp bin com.easeway.EaseWayTest`:
 Test Results: 37 Passed | 0 Failed
 ========================================================================
 ```
+
+---
+
+## 8. Project Contributors
+
+| Contributor | Profile Link | Role |
+| :--- | :--- | :--- |
+| **Renuka Nekkalapu** | [@renukanekkalapu-png](https://github.com/renukanekkalapu-png) | Project Lead & Maintainer |
+| **Paoli Patra** | [@paoli-patra26](https://github.com/paoli-patra26) | Collaborator / Contributor |
+| **Tanvi J** | [@tanvij33](https://github.com/tanvij33) | Collaborator / Contributor |
+| **Manasi Kittur** | [@kitturmanasi-lgtm](https://github.com/kitturmanasi-lgtm) | Collaborator / Contributor |
+
